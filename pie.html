@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PieTest</title>
+</head>
+<style>
+    . {
+        margin: 0 auto;
+    }
+
+    html {
+        height: 100%;
+        width: 100%
+    }
+
+    body {
+        height: 100%;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    svg {
+        display: block;
+        margin: 0 auto;
+    }
+</style>
+<script>
+    const data = [
+        {weight: 0.1, color: 'red', description: "D"},
+        {weight: 0.1, color: 'black', description: "D"},
+        {weight: 0.1, color: 'blue', description: "D"},
+        {weight: 0.1, color: 'green', description: "D"},
+        {weight: 0.1, color: 'pink', description: "D"},
+        {weight: 0.1, color: 'red', description: "D"},
+        {weight: 0.1, color: 'black', description: "D"},
+        {weight: 0.1, color: 'blue', description: "D"},
+        {weight: 0.1, color: 'green', description: "D"},
+        {weight: 0.1, color: 'yellow', description: "D"},
+    ]
+    window.onload = function () {
+        createPie(data, document.getElementById("pie"), 100, 100, 50)
+    }
+
+    function createPie(data, svg, rx, ry, r) {
+        var svgns = "http://www.w3.org/2000/svg";
+        let startAngle = 0;
+        let i = 0;
+        data.forEach(item => {
+            const curAngle = 2 * Math.PI * item.weight;
+            const x1 = rx + r * Math.sin(startAngle)
+            const y1 = ry - r * Math.cos(startAngle)
+
+            const endAngle = startAngle + curAngle;
+            const x2 = rx + r * Math.sin(endAngle)
+            const y2 = ry - r * Math.cos(endAngle)
+
+            const big = (endAngle - startAngle) > Math.PI ? 1 : 0
+            var path = document.createElementNS(svgns, "path");
+            var d = "M " + rx + "," + ry + //从圆心开始
+                " L " + x1 + "," + y1 +   //画一条到(x1,y1)的线段
+                " A " + r + "," + r +     //再画一条半径为r的弧
+                " 0 " + big + " 1 " +    // 弧的详细信息
+                x2 + "," + y2 +    //弧到(x2,y2)结束
+                " Z";   //d当前路径到(cx,cy)结束
+            path.setAttribute("d", d);   //设置路径
+            path.setAttribute("fill", item.color); //设置楔的颜色
+            path.setAttribute("stroke", "white");  //楔的外边框为黑色
+            path.setAttribute("stroke-width", "0.5"); //两
+            path.setAttribute("id", "k" + i); //两
+
+            svg.appendChild(path); //将楔加入到饼状图中
+
+            // line
+            const centerAngle = (startAngle + endAngle) / 2
+            const x3 = rx + r * Math.sin(centerAngle)
+            const y3 = ry - r * Math.cos(centerAngle)
+            const x4 = rx + (r + 5) * Math.sin(centerAngle)
+            const y4 = ry - (r + 5) * Math.cos(centerAngle)
+            let line = document.createElementNS(svgns, "path");
+
+            line.setAttribute("stroke", item.color); //设置楔的颜色
+            line.setAttribute("stroke-width", 0.5); //设置楔的颜色
+            line.setAttribute("id", "l" + i); //设置楔的颜色
+
+            line.setAttribute("d", "M" + x3 + ", " + y3 + " L " + x4 + " , " + y4)
+            // line.setAttribute("y1", y3)
+            //
+            // line.setAttribute("x2", x4)
+            // line.setAttribute("y2", y4)
+
+            svg.append(line)
+
+            //text
+            let text = document.createElementNS(svgns, "text");
+            text.setAttribute("x", x4)
+
+            text.setAttribute("y", y4)
+            text.setAttribute("font-family", "sans-serif");
+            text.setAttribute("font-size", "8");
+            console.log("start Angle", startAngle)
+            console.log("center Angle", centerAngle)
+            console.log("cos Angle", Math.cos(centerAngle))
+            console.log("sin Angle", Math.sin(centerAngle))
+
+            console.log("end Angle", endAngle)
+            console.log("=========")
+
+            if (centerAngle < 0.125 * 2 * Math.PI) {
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("dominant-baseline", "text-after-edge");
+            } else if (centerAngle < 0.25 * 2 * Math.PI) {
+                text.setAttribute("text-anchor", "start");
+                text.setAttribute("dominant-baseline", "central");
+            } else if (centerAngle < 0.375 * 2 * Math.PI) {
+                text.setAttribute("text-anchor", "start");
+                text.setAttribute("dominant-baseline", "central");
+            } else if (centerAngle < 0.5 * 2 * Math.PI) {
+                text.setAttribute("text-anchor", "start");
+                text.setAttribute("dominant-baseline", "text-before-edge");
+            } else if (centerAngle < 0.625 * 2 * Math.PI) {
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("dominant-baseline", "text-before-edge");
+            } else if (centerAngle < 0.75 * 2 * Math.PI) {
+                text.setAttribute("text-anchor", "end");
+                text.setAttribute("dominant-baseline", "central");
+            } else if (centerAngle < 0.875 * 2 * Math.PI) {
+                text.setAttribute("text-anchor", "end");
+                text.setAttribute("dominant-baseline", "central");
+            } else {
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("dominant-baseline", "text-after-edge");
+            }
+
+
+            // if(centerAngle > Math.PI) {
+            // } else {
+            //     text.setAttribute("text-anchor", "start");
+            // }
+            text.appendChild(document.createTextNode(item.description));
+            //
+            // text.append(textPath)
+            svg.append(text)
+            startAngle = endAngle;
+            i++
+        })
+    }
+
+</script>
+<body>
+<svg id="pie" width="800px" height="800px" viewBox="0 0 200 200">
+</svg>
+
+</body>
+</html>
